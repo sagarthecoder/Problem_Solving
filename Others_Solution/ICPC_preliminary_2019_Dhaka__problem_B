@@ -1,0 +1,66 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+   typedef tree<int, null_type, less_equal<int>, rb_tree_tag, ///If we use less_equal then it's performed as multiset
+        tree_order_statistics_node_update>
+        ordered_set;
+int bap[100003];
+int bapke(int x)
+{
+    if(bap[x]==x)return x;
+    return bap[x]=bapke(bap[x]);
+
+}
+int main()
+{
+    int t;scanf("%d",&t);
+    for(int a=1;a<=t;a++)
+    {
+        int n,q,ck,x,y,R;scanf("%d %d",&n,&q);
+        for(int i=0;i<=n;i++)bap[i]=i;
+        ordered_set s[n+2];
+        for(int i=0;i<=n;i++)s[i].clear();
+        printf("Case %d:\n",a);
+        while(q--)
+        {
+            scanf("%d %d %d",&ck,&x,&y);
+            if(ck==0){
+                if(x>y)swap(x,y);
+               int  A=bapke(x),B=bapke(y);
+
+               if(A!=B){
+                 int szA=s[A].size(),szB=s[B].size();
+                 if(szA>szB){
+                    bap[B]=A;
+                     for(auto i=s[B].begin();i!=s[B].end();i++)s[A].insert(*i);
+                 }
+                 else {
+                    bap[A]=B;
+                     for(auto i=s[A].begin();i!=s[A].end();i++)s[B].insert(*i);
+                 }
+               }
+            }
+
+            else if(ck==1){
+                int root=bapke(x);
+                s[root].insert(y);
+            }
+            else{
+                scanf("%d",&R);
+                int ans=0;;
+                int root=bapke(x);
+               if(!s[root].empty()){
+                    int low=s[root].order_of_key(y);
+                    int high=s[root].order_of_key(R+1);
+                    ans=high-low;
+               }
+                printf("%d\n",ans);
+            }
+
+        }
+    }
+    return 0;
+
+}

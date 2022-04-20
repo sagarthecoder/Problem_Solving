@@ -1,0 +1,96 @@
+#include <bits/stdc++.h>
+#define ll long long
+using namespace std;
+ll ara[100003];
+ll Lazy[400005],tree[400005];
+ll  jug;
+ll  build(ll node,ll i,ll j,ll start,ll finish)
+{
+
+    ll left=(node<<1);
+    ll right=left+1;
+    ll mid=(i+j)>>1;
+    tree[node]+=Lazy[node];
+    if(i<j){
+        Lazy[left]+=Lazy[node];
+        Lazy[right]+=Lazy[node];
+    }
+    Lazy[node]=0;
+    if(i>finish || j<start)return tree[node];
+    if(i>=start && j<=finish){
+        Lazy[node]+=jug;return Lazy[node]+tree[node];
+    }
+    ll p1=build(left,i,mid,start,finish);
+    ll p2=build(right,mid+1,j,start,finish);
+    return tree[node]=min(p1,p2);
+}
+ll query(ll node,ll i,ll j,ll start,ll finish)
+{
+
+    ll left=(node<<1);
+    ll right=left+1;
+    ll mid=(i+j)>>1;
+    tree[node]+=Lazy[node];
+    if(i<j){
+        Lazy[left]+=Lazy[node];
+        Lazy[right]+=Lazy[node];
+    }
+    Lazy[node]=0;
+    if(i>finish || j<start)return 1000000000000000;
+    if(i>=start && j<=finish){
+        return tree[node];
+    }
+    ll p1=query(left,i,mid,start,finish);
+    ll q1=query(right,mid+1,j,start,finish);
+    return min(p1,q1);
+
+}
+int main()
+{
+    int t;scanf("%d",&t);
+    for(int a=1;a<=t;a++)
+    {
+        ll n,q,ck,x,y;scanf("%lld %lld",&n,&q);memset(tree,0,sizeof(tree));
+        memset(Lazy,0,sizeof(Lazy));
+        for(ll i=1;i<=n;i++){scanf("%lld",&ara[i]);
+         if(ara[i]!=0){
+           ll mn=min(n,i+ara[i]-1);jug=1;
+           build(1,1,n,i,mn);
+         }
+        }
+        printf("Case %d:\n",a);
+        while(q--)
+        {
+            scanf("%lld",&ck);
+            if(ck==1){
+                scanf("%lld %lld",&x,&y);
+                jug=-1;
+                if(ara[x]!=0){
+                    ll mn=min(n,ara[x]+x-1);
+                    build(1,1,n,x,mn);
+                }
+                if(y!=0){
+                    jug=1;
+                    ll mn=min(n,x+y-1);
+                    build(1,1,n,x,mn);
+                }
+                ara[x]=y;
+            }
+            else{
+                scanf("%lld",&x);
+                if(x>n){
+                    printf("yes\n");continue;
+                }
+                if(x<=0){
+                    printf("no\n");continue;
+                }
+                ll ans=query(1,1,n,x,n);
+
+                if(ans<=0)printf("no\n");
+                else printf("yes\n");
+            }
+        }
+    }
+    return 0;
+
+}
